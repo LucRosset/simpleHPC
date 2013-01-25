@@ -1,0 +1,12 @@
+stop.at = 10
+
+# world definition props
+min.x = 0
+min.y = 0
+max.x = 11
+max.y = 11 
+grid.buffer = 1
+
+# these must multiply to total number of processes
+proc.per.x = 2
+proc.per.y = 2
