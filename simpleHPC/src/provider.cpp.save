@@ -1,0 +1,11 @@
+#include <repast_hpc/AgentId.h>
+
+#include "provider.h"
+
+void Provider::provideContent(Bird* agent, std::vector<BirdPackage>& out){
+    repast::AgentId id = agent->getId();
+5 HumanPackage package = {id.id () , id. startingRank () ,
+6 id. agentType () ,agent -> infected () };
+7 out. push_back ( package );
+    
+}
