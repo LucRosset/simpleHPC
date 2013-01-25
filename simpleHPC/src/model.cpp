@@ -1,10 +1,3 @@
-#include <repast_hpc/AgentId.h>
-#include <repast_hpc/Point.h>
-#include <repast_hpc/Properties.h>
-#include <repast_hpc/RepastProcess.h>
-#include <repast_hpc/SharedContext.h>
-#include <repast_hpc/SharedSpace.h>
-
 #include "bird.h"
 #include "model.h"
 
@@ -19,44 +12,54 @@ const std::string PROC_Y = "proc.per.y";
 
 namespace mpi = boost::mpi;
 
-BirdModel::BirdModel(const std::string& propsFile, int argc, char* argv[], mpi::communicator* world) :
-    props(propsFile, argc, argv, world) {
+BirdModel::BirdModel(const std::string& propsFile, int argc, char* argv[],
+		mpi::communicator* world) :
+		props(propsFile, argc, argv, world), providerUpdater(agents) {
 
-    repast::RepastProcess* rp = repast::RepastProcess::instance();
-    rank = rp->rank();
+	repast::RepastProcess* rp = repast::RepastProcess::instance();
+	rank = rp->rank();
 
-    int x = repast::strToInt(props.getProperty(MAX_X)) - repast::strToInt(props.getProperty(MIN_X)) + 1;
-    int y = repast::strToInt(props.getProperty(MAX_Y)) - repast::strToInt(props.getProperty(MIN_Y)) + 1;
+	stopAt = repast::strToInt(props.getProperty(STOP_AT));
 
-    int procX = repast::strToInt(props.getProperty(PROC_X));
-    int procY = repast::strToInt(props.getProperty(PROC_Y));
+	int x = repast::strToInt(props.getProperty(MAX_X))
+			- repast::strToInt(props.getProperty(MIN_X)) + 1;
+	int y = repast::strToInt(props.getProperty(MAX_Y))
+			- repast::strToInt(props.getProperty(MIN_Y)) + 1;
 
-    std::vector<int> procDim;
-    procDim.push_back(procX);
-    procDim.push_back(procY);
+	int procX = repast::strToInt(props.getProperty(PROC_X));
+	int procY = repast::strToInt(props.getProperty(PROC_Y));
 
-    int gridBuffer = repast::strToInt(props.getProperty(GRID_BUFFER));
+	std::vector<int> procDim;
+	procDim.push_back(procX);
+	procDim.push_back(procY);
 
-    // Create the Grid
-    grid = new repast::SharedGrids<Bird>::SharedStrictGrid("grid ",
-            repast::GridDimensions(repast::Point<int>(x, y)), procDim, gridBuffer, world);
-    agents.addProjection(grid);
+	int gridBuffer = repast::strToInt(props.getProperty(GRID_BUFFER));
 
-    int dimX = x / procX;
-    int dimY = y / procY;
+	// Create the Grid
+	grid = new repast::SharedGrids<Bird>::SharedWrappedGrid("grid ",
+			repast::GridDimensions(repast::Point<int>(x, y)), procDim,
+			gridBuffer, world);
+	agents.addProjection(grid);
 
-    int originX = grid->dimensions().origin().getX();
-    int originY = grid->dimensions().origin().getY();
+	int dimX = x / procX;
+	int dimY = y / procY;
 
-    // Create the agents
-    Bird* bird;
-    for(int i = 0; i < (dimX * dimY); i++) {
-        repast::AgentId id(i, rank, 0);
-        bird = new Bird(id, i * 2, i / 2);
-        agents.addAgent(bird);
-        grid->moveTo(bird, repast::Point<int>(originX + (i / dimX), originY + (i % dimY)));
-        std::cout << id << " " << rank << " " << originX + (i / dimX) << " " << originY + (i % dimY) << std::endl;
-    }
+	int originX = grid->dimensions().origin().getX();
+	int originY = grid->dimensions().origin().getY();
+
+	// Create the agents
+	Bird* bird;
+	for (int i = 0; i < (dimX * dimY); i++) {
+		repast::AgentId id(i, rank, 0);
+		bird = new Bird(id, i * 2, i / 2);
+		agents.addAgent(bird);
+		grid->moveTo(bird,
+				repast::Point<int>(originX + (i / dimX), originY + (i % dimY)));
+		// std::cout << id << " " << rank << " " << originX + (i / dimX) << " "
+		//		<< originY + (i % dimY) << std::endl;
+	}
+
+	grid->synchBuffer<BirdPackage>(agents, providerUpdater, providerUpdater);
 }
 
 BirdModel::~BirdModel() {
@@ -66,7 +69,23 @@ void BirdModel::init() {
 }
 
 void BirdModel::initSchedule(repast::ScheduleRunner& runner) {
+	runner.scheduleStop(stopAt);
+
+	runner.scheduleEvent(1, 1,
+			repast::Schedule::FunctorPtr(
+					new repast::MethodFunctor<BirdModel>(this,
+							&BirdModel::step)));
+
+	runner.scheduleEvent(1.05, 1,
+			repast::Schedule::FunctorPtr(
+					new repast::MethodFunctor<BirdModel>(this,
+							&BirdModel::synchAgents)));
 }
 
 void BirdModel::step() {
+		std::cout << "  " << rank << "  " << std::endl;
+}
+
+void BirdModel::synchAgents() {
+	repast::syncAgents<BirdPackage>(providerUpdater, providerUpdater);
 }
