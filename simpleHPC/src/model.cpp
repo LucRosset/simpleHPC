@@ -83,7 +83,37 @@ void BirdModel::initSchedule(repast::ScheduleRunner& runner) {
 }
 
 void BirdModel::step() {
-		std::cout << "  " << rank << "  " << std::endl;
+	int x = repast::strToInt(props.getProperty(MAX_X))
+			- repast::strToInt(props.getProperty(MIN_X)) + 1;
+	int y = repast::strToInt(props.getProperty(MAX_Y))
+			- repast::strToInt(props.getProperty(MIN_Y)) + 1;
+
+	int procX = repast::strToInt(props.getProperty(PROC_X));
+	int procY = repast::strToInt(props.getProperty(PROC_Y));
+
+	int dimX = x / procX;
+	int dimY = y / procY;
+
+	std::vector<int> position(2);
+	for (int i = 0; i < (dimX * dimY); i++) {
+		repast::AgentId id(i, rank, 0);
+		if (grid->getLocation(id, position)) {
+			Bird * bird = agents.getAgent(id);
+
+			int o = position[0]+1;
+
+			Bird* vizinho1 = grid->getObjectAt(
+					repast::Point<int>(position[0] + 1, position[1]));
+			Bird* vizinho2 = grid->getObjectAt(
+					repast::Point<int>(position[0], position[1] + 1));
+			Bird* vizinho3 = grid->getObjectAt(
+					repast::Point<int>(position[0] - 1, position[1]));
+			Bird* vizinho4 = grid->getObjectAt(
+					repast::Point<int>(position[0], position[1] - 1));
+
+			// realiza algum processamento entre o agente e os vininhos.
+		}
+	}
 }
 
 void BirdModel::synchAgents() {
