@@ -55,8 +55,8 @@ BirdModel::BirdModel(const std::string& propsFile, int argc, char* argv[],
 		agents.addAgent(bird);
 		grid->moveTo(bird,
 				repast::Point<int>(originX + (i / dimX), originY + (i % dimY)));
-		// std::cout << id << " " << rank << " " << originX + (i / dimX) << " "
-		//		<< originY + (i % dimY) << std::endl;
+		std::cout << id << " " << rank << " " << originX + (i / dimX) << " "
+				<< originY + (i % dimY) << std::endl;
 	}
 
 	grid->synchBuffer<BirdPackage>(agents, providerUpdater, providerUpdater);
@@ -86,18 +86,22 @@ void BirdModel::step() {
 	//std::cout << "  " << rank << "  " << std::endl;
 
 	std::vector<int> position(2);
-	for (int i=0; i < dimX*dimY; i++) {
-		repast::AgentId id = repast::AgentId(i,rank,0);
+	for (int i = 0; i < dimX * dimY; i++) {
+		repast::AgentId id = repast::AgentId(i, rank, 0);
 		if (grid->getLocation(id, position)) {
 			Bird* bird_0 = agents.getAgent(id);
 			Bird* bird_1;
-			if (position[1] != sizeY-1) // Check if agent is not in the lowest row
-				bird_1 = grid->getObjectAt(repast::Point<int>(position[0], position[1] + 1));
-			else if (position[0] != sizeX-1) // Check if agent is in the last column
-				bird_1 = grid->getObjectAt(repast::Point<int>(position[0]+1, 0));
-			else // agent is in (sizeX-1 ; sizeY-1)
-				bird_1 = grid->getObjectAt(repast::Point<int>(0,0));
-			std::cout << "THIS: " << bird_0->getId() << "   NEXT: " << bird_1->getId() << std::endl;
+			if (position[1] != sizeY - 1) // Check if agent is not in the lowest row
+				bird_1 = grid->getObjectAt(
+						repast::Point<int>(position[0], position[1] + 1));
+			else if (position[0] != sizeX - 1) // Check if agent is in the last column
+				bird_1 = grid->getObjectAt(
+						repast::Point<int>(position[0] + 1, 0));
+			else
+				// agent is in (sizeX-1 ; sizeY-1)
+				bird_1 = grid->getObjectAt(repast::Point<int>(0, 0));
+			std::cout << "THIS: " << bird_0->getId() << "   NEXT: "
+					<< bird_1->getId() << std::endl;
 		}
 	}
 }
