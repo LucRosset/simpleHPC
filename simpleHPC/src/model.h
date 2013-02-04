@@ -20,6 +20,10 @@ class BirdModel {
 private:
 	int rank;
 	int stopAt;
+	int sizeX;
+	int sizeY;
+	int dimX;
+	int dimY;
 	repast::SharedContext<Bird> agents;
 	repast::SharedGrids<Bird>::SharedWrappedGrid* grid;
 	repast::Properties props;

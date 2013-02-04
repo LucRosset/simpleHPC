@@ -4,3 +4,6 @@
 .settings
 /run.sh
 /Release
+/bin
+/obj
+.DS_Store

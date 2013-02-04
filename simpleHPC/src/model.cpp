@@ -21,9 +21,9 @@ BirdModel::BirdModel(const std::string& propsFile, int argc, char* argv[],
 
 	stopAt = repast::strToInt(props.getProperty(STOP_AT));
 
-	int x = repast::strToInt(props.getProperty(MAX_X))
+	sizeX = repast::strToInt(props.getProperty(MAX_X))
 			- repast::strToInt(props.getProperty(MIN_X)) + 1;
-	int y = repast::strToInt(props.getProperty(MAX_Y))
+	sizeY = repast::strToInt(props.getProperty(MAX_Y))
 			- repast::strToInt(props.getProperty(MIN_Y)) + 1;
 
 	int procX = repast::strToInt(props.getProperty(PROC_X));
@@ -37,12 +37,12 @@ BirdModel::BirdModel(const std::string& propsFile, int argc, char* argv[],
 
 	// Create the Grid
 	grid = new repast::SharedGrids<Bird>::SharedWrappedGrid("grid ",
-			repast::GridDimensions(repast::Point<int>(x, y)), procDim,
+			repast::GridDimensions(repast::Point<int>(sizeX, sizeY)), procDim,
 			gridBuffer, world);
 	agents.addProjection(grid);
 
-	int dimX = x / procX;
-	int dimY = y / procY;
+	dimX = sizeX / procX;
+	dimY = sizeY / procY;
 
 	int originX = grid->dimensions().origin().getX();
 	int originY = grid->dimensions().origin().getY();
@@ -83,35 +83,21 @@ void BirdModel::initSchedule(repast::ScheduleRunner& runner) {
 }
 
 void BirdModel::step() {
-	int x = repast::strToInt(props.getProperty(MAX_X))
-			- repast::strToInt(props.getProperty(MIN_X)) + 1;
-	int y = repast::strToInt(props.getProperty(MAX_Y))
-			- repast::strToInt(props.getProperty(MIN_Y)) + 1;
-
-	int procX = repast::strToInt(props.getProperty(PROC_X));
-	int procY = repast::strToInt(props.getProperty(PROC_Y));
-
-	int dimX = x / procX;
-	int dimY = y / procY;
+	//std::cout << "  " << rank << "  " << std::endl;
 
 	std::vector<int> position(2);
-	for (int i = 0; i < (dimX * dimY); i++) {
-		repast::AgentId id(i, rank, 0);
+	for (int i=0; i < dimX*dimY; i++) {
+		repast::AgentId id = repast::AgentId(i,rank,0);
 		if (grid->getLocation(id, position)) {
-			Bird * bird = agents.getAgent(id);
-
-			int o = position[0]+1;
-
-			Bird* vizinho1 = grid->getObjectAt(
-					repast::Point<int>(position[0] + 1, position[1]));
-			Bird* vizinho2 = grid->getObjectAt(
-					repast::Point<int>(position[0], position[1] + 1));
-			Bird* vizinho3 = grid->getObjectAt(
-					repast::Point<int>(position[0] - 1, position[1]));
-			Bird* vizinho4 = grid->getObjectAt(
-					repast::Point<int>(position[0], position[1] - 1));
-
-			// realiza algum processamento entre o agente e os vizinhos.
+			Bird* bird_0 = agents.getAgent(id);
+			Bird* bird_1;
+			if (position[1] != sizeY-1) // Check if agent is not in the lowest row
+				bird_1 = grid->getObjectAt(repast::Point<int>(position[0], position[1] + 1));
+			else if (position[0] != sizeX-1) // Check if agent is in the last column
+				bird_1 = grid->getObjectAt(repast::Point<int>(position[0]+1, 0));
+			else // agent is in (sizeX-1 ; sizeY-1)
+				bird_1 = grid->getObjectAt(repast::Point<int>(0,0));
+			std::cout << "THIS: " << bird_0->getId() << "   NEXT: " << bird_1->getId() << std::endl;
 		}
 	}
 }
