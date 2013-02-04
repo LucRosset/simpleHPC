@@ -111,7 +111,9 @@ void BirdModel::step() {
 			Bird* vizinho4 = grid->getObjectAt(
 					repast::Point<int>(position[0], position[1] - 1));
 
-			// realiza algum processamento entre o agente e os vininhos.
+			// realiza algum processamento entre o agente e os vizinhos.
+
+			std::cout << "I read my neighbors" << std::endl;
 		}
 	}
 }
