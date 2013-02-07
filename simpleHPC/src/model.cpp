@@ -59,6 +59,7 @@ BirdModel::BirdModel(const std::string& propsFile, int argc, char* argv[],
 				<< originY + (i % dimY) << std::endl;
 	}
 
+	grid->initSynchBuffer(agents);
 	grid->synchBuffer<BirdPackage>(agents, providerUpdater, providerUpdater);
 }
 
@@ -108,4 +109,5 @@ void BirdModel::step() {
 
 void BirdModel::synchAgents() {
 	repast::syncAgents<BirdPackage>(providerUpdater, providerUpdater);
+	grid->synchBuffer<BirdPackage>(agents, providerUpdater, providerUpdater);
 }
