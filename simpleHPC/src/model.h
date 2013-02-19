@@ -9,8 +9,11 @@
 #include <repast_hpc/Schedule.h>
 #include <repast_hpc/SharedContext.h>
 #include <repast_hpc/SharedSpace.h>
+#include <repast_hpc/SVDataSetBuilder.h>
 #include <repast_hpc/Utilities.h>
 
+#include "bird.h"
+#include "birdData.h"
 #include "providerUpdater.h"
 
 namespace mpi = boost::mpi;
@@ -45,6 +48,11 @@ public:
 	void step();
 
 	void synchAgents();
+
+	/**
+	 * ONLY FOR TEST
+	 */
+	int getTest();
 };
 
 #endif // MODEL_H_INCLUDED

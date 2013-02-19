@@ -1,4 +1,3 @@
-#include "bird.h"
 #include "model.h"
 
 const std::string STOP_AT = "stop.at";
@@ -81,6 +80,35 @@ void BirdModel::initSchedule(repast::ScheduleRunner& runner) {
 			repast::Schedule::FunctorPtr(
 					new repast::MethodFunctor<BirdModel>(this,
 							&BirdModel::synchAgents)));
+
+	/**
+	 * NETCDF TEST
+	 */
+	// Create a builder for netcdf aggregate data collection
+	repast::SVDataSetBuilder builder("./logs/data.csv", ";",
+			repast::RepastProcess::instance()->getScheduleRunner().schedule());
+
+	// This is the data source
+	BirdData* Bdata = new BirdData(this);
+	builder.addDataSource(
+			repast::createSVDataSource("RANDOM_NUMBERS", Bdata,
+					std::plus<int>()));
+	repast::DataSet* dataSet = builder.createDataSet();
+
+	// Schedule the record and write on the dataset
+	runner.scheduleEvent(1.1, 1,
+			repast::Schedule::FunctorPtr(
+					new repast::MethodFunctor<repast::DataSet>(dataSet,
+							&repast::DataSet::record)));
+
+	repast::Schedule::FunctorPtr dsWrite = repast::Schedule::FunctorPtr(
+			new repast::MethodFunctor<repast::DataSet>(dataSet,
+					&repast::DataSet::write));
+
+	runner.scheduleEvent(1.2, 1, dsWrite);
+
+	// Make sure we write the data when the sim ends
+	runner.scheduleEndEvent(dsWrite);
 }
 
 void BirdModel::step() {
@@ -110,4 +138,8 @@ void BirdModel::step() {
 void BirdModel::synchAgents() {
 	repast::syncAgents<BirdPackage>(providerUpdater, providerUpdater);
 	grid->synchBuffer<BirdPackage>(agents, providerUpdater, providerUpdater);
+}
+
+int BirdModel::getTest() {
+	return std::rand() % 10;
 }
