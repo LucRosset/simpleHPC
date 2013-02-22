@@ -16,6 +16,7 @@ struct BirdPackage {
         ar & type;
         ar & heading;
         ar & speed;
+        ar & fastest;
     }
 
     int id;
@@ -23,6 +24,7 @@ struct BirdPackage {
     int type;
     float heading;
     float speed;
+    bool fastest;
 
     repast::AgentId getId() const {
         return repast::AgentId(id, proc, type);
@@ -37,6 +39,7 @@ private:
     repast::AgentId id;
     float heading;
     float speed;
+    bool fastest;
 
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
@@ -44,6 +47,7 @@ private:
         ar & id;
         ar & heading;
         ar & speed;
+        ar & fastest;
     }
 
 public:
@@ -55,6 +59,9 @@ public:
 
     float getSpeed();
     void setSpeed(float _speed);
+
+    bool getFastest();
+    void setFastest(bool _fastest);
 
     void fly(int time);
 

@@ -14,6 +14,7 @@
 
 #include "bird.h"
 #include "birdData.h"
+#include "fastest.h"
 #include "providerUpdater.h"
 
 namespace mpi = boost::mpi;
@@ -53,6 +54,8 @@ public:
 	 * ONLY FOR TEST
 	 */
 	int getTest();
+
+	int countFastest ();
 };
 
 #endif // MODEL_H_INCLUDED

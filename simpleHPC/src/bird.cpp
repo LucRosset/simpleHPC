@@ -4,6 +4,7 @@ Bird::Bird(repast::AgentId _id, float _heading, float _speed) {
 	id = _id;
 	Bird::setHeading(_heading);
 	Bird::setSpeed(_speed);
+	Bird::setFastest(false);
 }
 
 Bird::~Bird() {
@@ -23,6 +24,14 @@ float Bird::getSpeed() {
 
 void Bird::setSpeed(float _speed) {
 	speed = _speed;
+}
+
+bool Bird::getFastest() {
+	return fastest;
+}
+
+void Bird::setFastest(bool _fastest) {
+	fastest = _fastest;
 }
 
 void Bird::fly(int time) {
