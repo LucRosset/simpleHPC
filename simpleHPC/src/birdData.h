@@ -3,6 +3,8 @@
 
 #include <repast_hpc/TDataSource.h>
 
+#include "model.h"
+
 class BirdModel;
 
 class BirdData: public repast::TDataSource<int> {

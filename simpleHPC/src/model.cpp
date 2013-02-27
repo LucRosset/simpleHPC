@@ -157,10 +157,10 @@ void BirdModel::step() {
 					repast::Point<int>((position[0] + 1) % sizeX, position[1]));
 			isFastest += (neighbour->getSpeed() < thisBird->getSpeed());
 			neighbour = grid->getObjectAt(
-					repast::Point<int>(position[0], (position[1] - 1) % sizeY));
+					repast::Point<int>(position[0], (position[1] - 1 + sizeY) % sizeY));
 			isFastest += (neighbour->getSpeed() < thisBird->getSpeed());
 			neighbour = grid->getObjectAt(
-					repast::Point<int>((position[0] - 1) % sizeX, position[1]));
+					repast::Point<int>((position[0] - 1 + sizeX) % sizeX, position[1]));
 			isFastest += (neighbour->getSpeed() < thisBird->getSpeed());
 
 			thisBird->setFastest((bool) isFastest);

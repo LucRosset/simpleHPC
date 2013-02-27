@@ -3,6 +3,8 @@
 
 #include <repast_hpc/TDataSource.h>
 
+#include "model.h"
+
 class BirdModel;
 
 class Fastest: public repast::TDataSource<int> {
