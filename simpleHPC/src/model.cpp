@@ -203,4 +203,3 @@ int BirdModel::countFastest() {
 	}
 	return num;
 }
-//
