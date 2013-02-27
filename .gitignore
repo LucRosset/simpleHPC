@@ -12,6 +12,8 @@
 *.la
 *.a
 
+/bin
+/obj
 /Debug
 /logs
 .cproject

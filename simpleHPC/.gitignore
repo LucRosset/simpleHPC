@@ -1,9 +1,23 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+/bin
+/obj
 /Debug
 /logs
 .cproject
 .settings
 /run.sh
 /Release
-/bin
-/obj
 .DS_Store
