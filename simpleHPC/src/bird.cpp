@@ -4,7 +4,7 @@ Bird::Bird(repast::AgentId _id, float _heading, float _speed) {
 	id = _id;
 	Bird::setHeading(_heading);
 	Bird::setSpeed(_speed);
-	Bird::setFastest(false);
+	Bird::setFastest(true);
 }
 
 Bird::~Bird() {

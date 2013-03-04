@@ -16,6 +16,7 @@
 #include "birdData.h"
 #include "fastest.h"
 #include "providerUpdater.h"
+#include "speed.h"
 
 namespace mpi = boost::mpi;
 

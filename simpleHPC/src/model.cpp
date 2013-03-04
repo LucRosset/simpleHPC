@@ -137,6 +137,38 @@ void BirdModel::initSchedule(repast::ScheduleRunner& runner) {
 
 	// Make sure we write the data when the sim ends
 	runner.scheduleEndEvent(fastWrite);
+
+	/**
+	 * NETCDF TEST 3
+	 *
+	// Create a builder for netcdf aggregate data collection
+	repast::SVDataSetBuilder fastBuilder("./logs/fastest.csv", ";",
+			repast::RepastProcess::instance()->getScheduleRunner().schedule());
+
+	// This is the data source
+	Speed* speed = new Speed(this);
+	SpeedBuilder.addDataSource(
+			repast::createSVDataSource("SPEED", speed,
+					std::plus<int>()));
+	repast::DataSet* speedDataSet = speedBuilder.createDataSet();
+
+	// Schedule the record and write on the dataset
+	runner.scheduleEvent(1.1, 1,
+			repast::Schedule::FunctorPtr(
+					new repast::MethodFunctor<repast::DataSet>(speedDataSet,
+							&repast::DataSet::record)));
+
+	repast::Schedule::FunctorPtr fastWrite = repast::Schedule::FunctorPtr(
+			new repast::MethodFunctor<repast::DataSet>(speedDataSet,
+					&repast::DataSet::write));
+
+	runner.scheduleEvent(1.2, 1, speedWrite);
+
+	// Make sure we write the data when the sim ends
+	runner.scheduleEndEvent(speedWrite);
+	*
+	*
+	*/
 }
 
 void BirdModel::step() {
@@ -148,22 +180,28 @@ void BirdModel::step() {
 		if (grid->getLocation(id, position)) {
 			Bird* thisBird = agents.getAgent(id);
 			Bird* neighbour;
-			int isFastest = 0;
+			bool isFastest = true;
 
 			neighbour = grid->getObjectAt(
 					repast::Point<int>(position[0], (position[1] + 1) % sizeY));
-			isFastest += (neighbour->getSpeed() < thisBird->getSpeed());
+			isFastest *= (neighbour->getSpeed() < thisBird->getSpeed());
 			neighbour = grid->getObjectAt(
 					repast::Point<int>((position[0] + 1) % sizeX, position[1]));
-			isFastest += (neighbour->getSpeed() < thisBird->getSpeed());
+			isFastest *= (neighbour->getSpeed() < thisBird->getSpeed());
 			neighbour = grid->getObjectAt(
 					repast::Point<int>(position[0], (position[1] - 1 + sizeY) % sizeY));
-			isFastest += (neighbour->getSpeed() < thisBird->getSpeed());
+			isFastest *= (neighbour->getSpeed() < thisBird->getSpeed());
 			neighbour = grid->getObjectAt(
 					repast::Point<int>((position[0] - 1 + sizeX) % sizeX, position[1]));
-			isFastest += (neighbour->getSpeed() < thisBird->getSpeed());
+			isFastest *= (neighbour->getSpeed() < thisBird->getSpeed());
 
-			thisBird->setFastest((bool) isFastest);
+			thisBird->setFastest(isFastest);
+
+			// If bird is fastest it will decrease its speed, otherwise will try to gain speed (speed += 0.0 | 0.5 | 1.0)
+			if (isFastest)
+				thisBird->setSpeed(thisBird->getSpeed() -0.75);
+			else
+				thisBird->setSpeed(thisBird->getSpeed() + (std::rand()%3)*0.5);
 
 			/*
 			 Bird* bird_0 = agents.getAgent(id);
